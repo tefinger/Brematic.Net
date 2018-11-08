@@ -1,0 +1,62 @@
+image: Visual Studio 2017
+branches:
+  only:
+    - master
+    # We'll also build whenever there is a new commit on any branch starting with `features/`
+    - /feature\/.+/
+build_script:
+  - ps: .\build.ps1 -pack
+assembly_info:
+  # We'll version the binaries and the NuGet package in the build script
+  patch: false
+# We'll run the tests in the build script
+test: off
+# AppVeyor will create a release tag if a matching one does not exist
+# hence triggering another build
+skip_tags: true
+skip_commits:
+  files:
+    - .editorconfig
+    - LICENSE
+    - README.md
+deploy:
+  # The provider is case sensitive
+  - provider: GitHub
+    # By convention release versions start with `v`
+    release: v$(APPVEYOR_BUILD_VERSION)
+    auth_token:
+      # Encrypted `GitHub` `PAT`
+      # https://www.appveyor.com/docs/deployment/github/#provider-settings
+      secure: 4jxniAGrLoauvPI6eE0m3KIOCNgcFb9bmUD6dOCChJjCLsMNNq9mK/h780iCE1mx
+    artifact: packages
+    draft: false
+    prerelease: false
+    on:
+      branch: master
+  - provider: GitHub
+    # By convention release versions start with `v`
+    release: v$(APPVEYOR_BUILD_VERSION)
+    auth_token:
+      # Encrypted `GitHub` `PAT`
+      # https://www.appveyor.com/docs/deployment/github/#provider-settings
+      secure: 4jxniAGrLoauvPI6eE0m3KIOCNgcFb9bmUD6dOCChJjCLsMNNq9mK/h780iCE1mx
+    artifact: packages
+    draft: false
+    prerelease: true
+    on:
+      branch: /feature\/.+/
+# Environment variables
+environment:
+  # No need to pre-warm the `NuGet` cache
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+# `install` will run before `build_script`
+install:
+  # `dotnet-install.ps1` is available at: https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
+  # `Cake.dll` is targeting `.NET Core` `1.0.9`, so we need to install the latest `1.0.x` runtime
+  # The runtime is required to run a `.NET Core` application, it's part of the `SDK`
+  # https://github.com/dotnet/core/blob/master/release-notes/download-archive.md
+  - ps: .\build\dotnet-install.ps1 -SharedRuntime -Version 1.0.9
+  # `BeanstalkSeeder` is targeting `.NET Core` `2.0`, so we can safely install the latest `SDK`
+  # The `SDK` is required to restore, build, publish... a `.NET Core` application
+  # https://www.microsoft.com/net/download/windows
+  - ps: .\build\dotnet-install.ps1 -Channel Current
