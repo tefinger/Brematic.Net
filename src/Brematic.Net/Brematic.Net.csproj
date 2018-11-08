@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Tobias Efinger</Authors>
+    <Version>0.0.1</Version>
+    <PackageProjectUrl>https://github.com/tefinger/Brematic.Net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tefinger/Brematic.Net</RepositoryUrl>
+    <PackageTags>brematic intertechno brennenstuhl smarthome</PackageTags>
+  </PropertyGroup>
+
+</Project>
