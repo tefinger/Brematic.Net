@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/04lpiuko31rts3s5/branch/master?svg=true)](https://ci.appveyor.com/project/tefinger/brematic-net/branch/master)
+
 # Brematic.Net
 This project offers a home for controlling your remote power outlets (and potentially other stuff) with your .NET applications. With the help of the community we might get other devices working aswell.
 
