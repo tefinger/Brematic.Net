@@ -34,18 +34,6 @@ deploy:
     prerelease: false
     on:
       branch: master
-  - provider: GitHub
-    # By convention release versions start with `v`
-    release: v$(APPVEYOR_BUILD_VERSION)
-    auth_token:
-      # Encrypted `GitHub` `PAT`
-      # https://www.appveyor.com/docs/deployment/github/#provider-settings
-      secure: 4jxniAGrLoauvPI6eE0m3KIOCNgcFb9bmUD6dOCChJjCLsMNNq9mK/h780iCE1mx
-    artifact: packages
-    draft: false
-    prerelease: true
-    on:
-      branch: /feature\/.+/
   - provider: NuGet
     api_key:
       # https://www.appveyor.com/docs/deployment/nuget/#provider-settings
