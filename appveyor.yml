@@ -6,6 +6,7 @@ branches:
     - /feature\/.+/
 build_script:
   - ps: .\build.ps1 -pack
+  - ps: .\build.ps1 -target Cover
 assembly_info:
   # We'll version the binaries and the NuGet package in the build script
   patch: false
@@ -45,10 +46,14 @@ deploy:
     prerelease: true
     on:
       branch: /feature\/.+/
+
 # Environment variables
 environment:
   # No need to pre-warm the `NuGet` cache
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  CODECOV_TOKEN:
+    secure: dxzoK73OLlDu9F1n8oHT7C/5idf8qniuKOUybjd3WghpR9Gmibu9CN93FAr9okKv
+
 # `install` will run before `build_script`
 install:
   # `dotnet-install.ps1` is available at: https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
