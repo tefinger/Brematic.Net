@@ -3,5 +3,7 @@ branches:
   feature:
     mode: ContinuousDeployment
     increment: Minor
+  master: 
+    increment: Minor
 ignore:
   sha: []
