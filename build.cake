@@ -100,7 +100,8 @@ Task("Test")
     .DeferOnError();
 
 Task("Cover")
-    .IsDependentOn("Build")
+    .IsDependentOn("Test")
+    .WithCriteria(() => HasArgument("cover"))
     .Does(() =>
     {
         var projects = GetFiles("./src/**/*.csproj");
@@ -142,12 +143,13 @@ Task("Cover")
                     .ExcludeByAttribute("*.ExcludeFromCodeCoverage*")
             );
         }
-
-        Codecov(resultsFile.FullPath);
+        if (HasArgument("codecov")) {
+            Codecov(resultsFile.FullPath);
+        }
     });
 
 Task("Pack")
-    .IsDependentOn("Test")
+    .IsDependentOn("Cover")
     .WithCriteria(() => HasArgument("pack"))
     .Does(() =>
     {

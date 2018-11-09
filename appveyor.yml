@@ -5,8 +5,7 @@ branches:
     # We'll also build whenever there is a new commit on any branch starting with `features/`
     - /feature\/.+/
 build_script:
-  - ps: .\build.ps1 -pack
-  - ps: .\build.ps1 -target Cover
+  - ps: .\build.ps1 -cover -codecov -pack
 assembly_info:
   # We'll version the binaries and the NuGet package in the build script
   patch: false
