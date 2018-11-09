@@ -1,3 +1,7 @@
+#tool "nuget:?package=OpenCover"
+#tool "nuget:?package=Codecov&version=1.1.0"
+#addin "nuget:?package=Cake.Codecov"
+
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
@@ -7,6 +11,8 @@ var packageVersion = "0.0.1";
 var artifactsDir = MakeAbsolute(Directory("artifacts"));
 var testsResultsDir = artifactsDir.Combine(Directory("test-results"));
 var packagesDir = artifactsDir.Combine(Directory("packages"));
+
+EnsureDirectoryExists(artifactsDir);
 
 var solutionPath = "./Brematic.Net.sln";
 
@@ -93,8 +99,57 @@ Task("Test")
     })
     .DeferOnError();
 
-Task("Pack")
+Task("Cover")
     .IsDependentOn("Test")
+    .WithCriteria(() => HasArgument("cover"))
+    .Does(() =>
+    {
+        var projects = GetFiles("./src/**/*.csproj");
+        foreach(var project in projects)
+        {
+            TransformTextFile(project.FullPath, ">", "<")
+                .WithToken("portable", ">full<")
+                .Save(project.FullPath);
+        }
+
+        projects = GetFiles("./tests/**/*.csproj");
+        var resultsFile = artifactsDir.CombineWithFilePath("coverage.xml");
+        foreach(var project in projects)
+        {
+            OpenCover(
+                x => x.DotNetCoreTest(
+                     project.FullPath,
+                     new DotNetCoreTestSettings() { 
+                       Configuration = configuration, 
+                       NoBuild = true 
+                     }
+                ),
+                resultsFile,
+                new OpenCoverSettings()
+                {
+                    ArgumentCustomization = args => args
+                        .Append("-threshold:100")
+                        .Append("-returntargetcode")
+                        .Append("-hideskipped:Filter;Attribute"),
+                    Register = "user",
+                    MergeOutput = true,
+                    OldStyle = true,
+                    SkipAutoProps = true,
+                    MergeByHash = true
+                }
+                    .WithFilter("+[Brematic.Net]*")
+                    .WithFilter("-[Brematic.Net.Tests]*")
+                    .WithFilter("-[xunit*]*")
+                    .ExcludeByAttribute("*.ExcludeFromCodeCoverage*")
+            );
+        }
+        if (HasArgument("codecov")) {
+            Codecov(resultsFile.FullPath);
+        }
+    });
+
+Task("Pack")
+    .IsDependentOn("Cover")
     .WithCriteria(() => HasArgument("pack"))
     .Does(() =>
     {
