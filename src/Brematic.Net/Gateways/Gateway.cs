@@ -17,9 +17,15 @@ namespace Brematic.Net.Gateways
 
         private int Port { get; }
 
+        protected internal abstract string GetHead(Device device);
+        protected internal abstract string GetTail(Device device);
+
         public void SendRequest(Device device, DeviceAction action)
         {
-            var data = device.GetSignal(this, action);
+            var head = GetHead(device);
+            var tail = GetTail(device);
+
+            var data = device.GetSignal(head, tail, action);
             SendDataToSocket(data);
         }
 
